@@ -1,6 +1,7 @@
 ﻿using metjelentes.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -72,7 +73,7 @@ namespace metjelentes
 
             //4. fewladat
             bool van = false;
-
+            Console.WriteLine("4. feladat");
             jelentesek.Where(j => j.Szel == "00000").ToList().ForEach(e =>
             {
                 Console.WriteLine($"{e.Telepules} {e.Ido.Substring(0, 2)}:{e.Ido.Substring(2)}");
@@ -92,30 +93,46 @@ namespace metjelentes
             Console.WriteLine("5. feladat");
             List<int> szamok = new List<int> { 1, 7, 13, 19 };
 
-            foreach(int i in szamok ) 
+            jelentesek.GroupBy(j => j.Telepules).ToList().ForEach(e => {
+                bool megvanMind = szamok.All(ora =>
+    jelentesek.Any(qw =>
+        qw.Telepules == e.Key &&
+        int.Parse(qw.Ido.Substring(0, 2)) == ora));
+
+                if (megvanMind)
+                {
+                    Console.Write($"{e.Key} Középhőmérséklet: " +
+                        $"{Math.Round(jelentesek.Where(qw => qw.Telepules == e.Key && szamok.Contains(int.Parse(qw.Ido.Substring(0, 2)))).Average(w => w.Homerseklet))}; ");
+                }
+                else
+                {
+                    Console.Write($"{e.Key} NA; ");
+                }
+                int top = jelentesek.Where(qw => qw.Telepules == e.Key).OrderBy(h => h.Homerseklet).First().Homerseklet;
+                int mini= jelentesek.Where(qw => qw.Telepules == e.Key).OrderBy(h => h.Homerseklet).Last().Homerseklet;
+                Console.WriteLine($"Hőmérséklet-ingadozás: {mini-top}");
+            });
+
+
+
+            Console.WriteLine("6. feladat");
+            Console.WriteLine("A fájlok elkészültek");
+            jelentesek.GroupBy(j => j.Telepules).ToList().ForEach(t =>
             {
-                jelentesek.Where(j => int.Parse(j.Ido.Substring(0, 2)) == i);
-            }
-
-
-
-            //Console.WriteLine("6. feladat");
-            //jelentesek.GroupBy(j => j.Telepules).ToList().ForEach(t =>
-            //{
-            //    Console.WriteLine(t.Key);
-            //using (StreamWriter sw = new StreamWriter($"{t.Key}.txt", true))
-            //{
-            //        sw.WriteLine(t.Key);
-            //    }
-            //    jelentesek.Where(qw => qw.Telepules == t.Key).ToList().ForEach(yx =>
-            //    {
-            //        using (StreamWriter sw = new StreamWriter($"{t.Key}.txt", true))
-            //        {
-            //            sw.WriteLine($"{yx.Ido.Substring(0, 2)}:{yx.Ido.Substring(2)} " +new string('#', yx.SzelSebesseg()));
-            //        }
-            //        Console.WriteLine(new string( '#', yx.SzelSebesseg()));
-            //    });
-            //});
+                Console.WriteLine(t.Key);
+                using (StreamWriter sw = new StreamWriter($"{t.Key}.txt", true))
+                {
+                    sw.WriteLine(t.Key);
+                }
+                jelentesek.Where(qw => qw.Telepules == t.Key).ToList().ForEach(yx =>
+                {
+                    using (StreamWriter sw = new StreamWriter($"{t.Key}.txt", true))
+                    {
+                        sw.WriteLine($"{yx.Ido.Substring(0, 2)}:{yx.Ido.Substring(2)} " + new string('#', yx.SzelSebesseg()));
+                    }
+                    Console.WriteLine(new string('#', yx.SzelSebesseg()));
+                });
+            });
 
 
 
